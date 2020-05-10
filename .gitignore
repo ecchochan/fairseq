@@ -78,6 +78,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+**/.ipynb_checkpoints
 
 # pyenv
 .python-version
@@ -130,3 +131,13 @@ data-bin/
 
 # Experimental Folder
 experimental/*
+
+# tokenizers
+fstokenizers/*/*
+fstokenizers/*.html
+fstokenizers/*.c
+fstokenizers/*.cpp
+fstokenizers/*.h
+fstokenizers/*.so
+fstokenizers/*.html
+fstokenizers/test*
