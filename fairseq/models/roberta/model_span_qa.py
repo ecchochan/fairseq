@@ -166,9 +166,9 @@ class RobertaQAEncoder(FairseqDecoder):
         self.span_logits =  nn.Linear(args.encoder_embed_dim, 2)
         self.answer_class = PoolerAnswerClass(args.encoder_embed_dim)
 
-    def apply_mixout(self):
+    def apply_mixout(self, p):
         from fairseq.optim.mixout import MixoutWrapper
-        self.sentence_encoder.apply(MixoutWrapper)
+        self.sentence_encoder.apply(MixoutWrapper, p)
 
     def forward(self, src_tokens, features_only=False, return_all_hiddens=False, cls_index=None, **unused):
         x, extra = self.extract_features(src_tokens, return_all_hiddens)
