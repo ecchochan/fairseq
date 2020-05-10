@@ -21,7 +21,7 @@ import torch
 import torch.nn as nn
 
 
-def MixoutWrapper(module: nn.Module, p: float = 0.5):
+def MixoutWrapper(module: nn.Module, p: float = 0.7):
     """
     Implementation of Mixout (https://arxiv.org/abs/1909.11299).
     Use with:
@@ -53,7 +53,7 @@ def MixoutWrapper(module: nn.Module, p: float = 0.5):
                 - p * module._params_orig[n]
             ) / (1 - p)
         else:
-            return module._params_learned[n]
+            return module._params_learned[n].data
 
     def hook(module, input):
         for n in module._names:

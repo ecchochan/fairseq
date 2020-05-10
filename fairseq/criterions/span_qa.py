@@ -24,7 +24,6 @@ class SQuAD2Criterion(FairseqCriterion):
 
     def forward(self, model, sample, reduce=True):
         # compute loss and accuracy
-        print(sample['id'])
         tokens = sample['tokens']
         start_positions = sample['starts']
         end_positions = sample['ends']
@@ -58,7 +57,7 @@ class SQuAD2Criterion(FairseqCriterion):
             'nsentences': sample['nsentences'],
             'sample_size': sample_size,
         }
-        logging_output['ncorrect'] = (start_logits.argmax(-1) == start_positions).sum() + (end_logits.argmax(-1) == end_positions).sum()
+        logging_output['ncorrect'] = ((start_logits.argmax(-1) == start_positions).sum() + (end_logits.argmax(-1) == end_positions).sum()) / 2
         return total_loss, sample_size, logging_output
 
     @staticmethod

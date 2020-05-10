@@ -69,8 +69,8 @@ class RobertaQAModel(FairseqLanguageModel):
                             help='number of positional embeddings to learn')
         parser.add_argument('--load-checkpoint-heads', action='store_true',
                             help='(re-)register and load heads when loading checkpoints')
-        parser.add_argument('--mixout', action='store_true',
-                            help='Use mixout instead of dropout')
+        parser.add_argument('--mixout', type=float, metavar='D',
+                            help='mixout probability')
 
     @classmethod
     def build_model(cls, args, task):
@@ -165,6 +165,10 @@ class RobertaQAEncoder(FairseqDecoder):
         )
         self.span_logits =  nn.Linear(args.encoder_embed_dim, 2)
         self.answer_class = PoolerAnswerClass(args.encoder_embed_dim)
+
+    def apply_mixout(self):
+        from fairseq.optim.mixout import MixoutWrapper
+        self.sentence_encoder.apply(MixoutWrapper)
 
     def forward(self, src_tokens, features_only=False, return_all_hiddens=False, cls_index=None, **unused):
         x, extra = self.extract_features(src_tokens, return_all_hiddens)
