@@ -10,7 +10,7 @@ import sys
 
 
 if sys.version_info < (3, 6):
-    sys.exit('Sorry, Python >= 3.6 is required for fairseq.')
+    sys.exit('Sorry, Python >= 3.6 is required for fairseq. (using %r)'%sys.version_info)
 
 
 with open('README.md') as f:
