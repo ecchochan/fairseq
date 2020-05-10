@@ -8,20 +8,12 @@ from fairseq import metrics, utils
 
 @register_criterion('span_qa')
 class SQuAD2Criterion(FairseqCriterion):
-    def __init__(self, args, task):
-        super().__init__(args, task)
-        if self.args.save_predictions is not None:
-            self.prediction_h = open(self.args.save_predictions, 'w')
-        else:
-            self.prediction_h = None
+    def __init__(self, task):
+        super().__init__(task)
 
-    @staticmethod
+    @classmethod
     def build_criterion(cls, args, task):
-        return cls(args, args, task)
-
-    def __del__(self):
-        if self.prediction_h is not None:
-            self.prediction_h.close()
+        return cls(task)
 
     @staticmethod
     def add_args(parser):
