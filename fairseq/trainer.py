@@ -21,9 +21,44 @@ from fairseq.logging import meters, metrics
 from fairseq.nan_detector import NanDetector
 from fairseq.optim import lr_scheduler
 
+import re
 
 logger = logging.getLogger(__name__)
 
+def get_decayed_param_groups(named_parameters, 
+                             num_layers, 
+                             lr=3e-5, 
+                             lr_decay=0.75, #0.908517, 
+                             weight_decay=None, 
+                             #freeze_transformer=False
+                             ):
+  lr_factors = []
+  for k, v in named_parameters:
+      if not v.requires_grad:
+        continue
+      #if freeze_transformer and ('sentence_encoder.layers' in k or 'embed_tokens.weight' in k or 'embed_positions' in k):
+      #  print('no grad:', k)
+      #  v.requires_grad = False
+      #  continue
+      param = {
+          'params': v,
+      }
+      if lr_decay and lr_decay != 1:
+        factor = 1
+        if 'sentence_encoder.layers' in k:
+          layer = int(re.search(r'.layers.(\d+)',k).group(1))
+          factor = lr_decay**(num_layers-layer)
+
+        elif 'embed_tokens.weight' in k or 'embed_positions' in k:
+          layer = 0
+          factor = lr_decay**(num_layers-layer)
+
+        param['lr'] = lr * factor
+        
+      lr_factors.append(param)
+      print(param)
+  return lr_factors
+      
 
 class Trainer(object):
     """Main class for data parallel training.
@@ -138,12 +173,20 @@ class Trainer(object):
         return self._lr_scheduler
 
     def _build_optimizer(self):
-        params = list(
-            filter(
-                lambda p: p.requires_grad,
-                chain(self.model.parameters(), self.criterion.parameters()),
+        from itertools import chain
+        if hasattr(self.args, 'encoder_layers'):
+            params = get_decayed_param_groups(
+                chain(self.model.named_parameters(), self.criterion.named_parameters()), 
+                num_layers=self.args.encoder_layers, 
+                lr=self.args.lr, 
+                lr_decay=self.args.lr_decay,)
+        else:
+            params = list(
+                filter(
+                    lambda p: p.requires_grad,
+                    chain(self.model.parameters(), self.criterion.parameters()),
+                )
             )
-        )
 
         if self.args.fp16:
             if self.cuda and torch.cuda.get_device_capability(0)[0] < 7:

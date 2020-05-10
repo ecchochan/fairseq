@@ -237,6 +237,8 @@ def get_parser(desc, default_task="translation"):
                         help='suffix to add to the checkpoint file name')
     parser.add_argument('--quantization-config-path', default=None,
                         help='path to quantization config file')
+    parser.add_argument('--lr-decay', default=1, type=float, 
+                        help='Learning rate decay factor, 1.0 = no decay')
 
     from fairseq.registry import REGISTRIES
     for registry_name, REGISTRY in REGISTRIES.items():
