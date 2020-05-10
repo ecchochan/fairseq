@@ -25,6 +25,12 @@ from fairseq.data import (
     StripTokenDataset,
     TruncateDataset,
 )
+from fairseq.models import (
+    FairseqDecoder,
+    FairseqLanguageModel,
+    register_model,
+    register_model_architecture,
+)
 from fairseq.tasks import FairseqTask, register_task
 
 import torch
