@@ -89,8 +89,11 @@ class RobertaQAModel(FairseqLanguageModel):
 
         x, extra = self.decoder(src_tokens, features_only, return_all_hiddens, **kwargs)
 
-
         return x, extra
+        
+    def apply_mixout(self, p):
+        from fairseq.optim.mixout import MixoutWrapper
+        self.decoder.sentence_encoder.apply(MixoutWrapper, p)
 
     @property
     def supported_targets(self):
@@ -165,10 +168,6 @@ class RobertaQAEncoder(FairseqDecoder):
         )
         self.span_logits =  nn.Linear(args.encoder_embed_dim, 2)
         self.answer_class = PoolerAnswerClass(args.encoder_embed_dim)
-
-    def apply_mixout(self, p):
-        from fairseq.optim.mixout import MixoutWrapper
-        self.sentence_encoder.apply(MixoutWrapper, p)
 
     def forward(self, src_tokens, features_only=False, return_all_hiddens=False, cls_index=None, **unused):
         x, extra = self.extract_features(src_tokens, return_all_hiddens)
