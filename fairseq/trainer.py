@@ -178,8 +178,8 @@ class Trainer(object):
             params = get_decayed_param_groups(
                 chain(self.model.named_parameters(), self.criterion.named_parameters()), 
                 num_layers=self.args.encoder_layers, 
-                lr=self.args.lr, 
-                lr_decay=self.args.lr_decay,)
+                lr=float(self.args.lr[0]), 
+                lr_decay=float(self.args.lr_decay),)
         else:
             params = list(
                 filter(
