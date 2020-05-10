@@ -16,6 +16,10 @@ class SQuAD2Criterion(FairseqCriterion):
         else:
             self.prediction_h = None
 
+    @staticmethod
+    def build_criterion(cls, args, task):
+        return cls(args, task)
+
     def __del__(self):
         if self.prediction_h is not None:
             self.prediction_h.close()
