@@ -6,7 +6,7 @@ import torch.nn as nn
 from torch.nn import CrossEntropyLoss
 from fairseq import metrics, utils
 
-@register_criterion('squad2')
+@register_criterion('span_qa')
 class SQuAD2Criterion(FairseqCriterion):
 
     def __init__(self, args, task):
@@ -29,6 +29,7 @@ class SQuAD2Criterion(FairseqCriterion):
 
     def forward(self, model, sample, reduce=True):
         # compute loss and accuracy
+        print(sample['id'])
         tokens = sample['tokens']
         start_positions = sample['starts']
         end_positions = sample['ends']

@@ -124,7 +124,7 @@ def from_records(records, max_seq_length):
 logger = logging.getLogger(__name__)
 
 from fairseq.data import BaseWrapperDataset
-@register_task('squad2')
+@register_task('span_qa')
 class SQuAD2Task(FairseqTask):
     """Task for training masked language models (e.g., BERT, RoBERTa)."""
 
@@ -159,8 +159,10 @@ class SQuAD2Task(FairseqTask):
         unanswerables = []
         
         lengths = []
+
+        data = from_records(path, self.args.max_seq_length)
         
-        for inp, start, end, unanswerable in from_records(path, self.args.max_seq_length):
+        for inp, start, end, unanswerable in data:
             tokens.append(inp)
             lengths.append(len(inp))
             starts.append(start)
