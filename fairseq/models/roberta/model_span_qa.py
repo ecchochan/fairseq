@@ -93,7 +93,8 @@ class RobertaQAModel(FairseqLanguageModel):
         
     def apply_mixout(self, p):
         from fairseq.optim.mixout import MixoutWrapper
-        self.decoder.sentence_encoder.apply(MixoutWrapper, p)
+        from functools import partial
+        self.decoder.sentence_encoder.apply(partial(MixoutWrapper, p))
 
     @property
     def supported_targets(self):
