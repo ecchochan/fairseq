@@ -4,6 +4,7 @@ import math
 from fairseq import utils
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss
+from fairseq import metrics, utils
 
 @register_criterion('squad2')
 class SQuAD2Criterion(FairseqCriterion):
@@ -62,6 +63,7 @@ class SQuAD2Criterion(FairseqCriterion):
             'nsentences': sample['nsentences'],
             'sample_size': sample_size,
         }
+        logging_output['ncorrect'] = (start_logits.argmax(-1) == start_positions).sum() + (end_logits.argmax(-1) == end_positions).sum()
         return total_loss, sample_size, logging_output
 
     @staticmethod
@@ -81,3 +83,27 @@ class SQuAD2Criterion(FairseqCriterion):
 
         return agg_output
         
+    @staticmethod
+    def reduce_metrics(logging_outputs) -> None:
+        """Aggregate logging outputs from data parallel training."""
+        loss_sum = sum(log.get('loss', 0) for log in logging_outputs)
+        ntokens = sum(log.get('ntokens', 0) for log in logging_outputs)
+        nsentences = sum(log.get('nsentences', 0) for log in logging_outputs)
+        sample_size = sum(log.get('sample_size', 0) for log in logging_outputs)
+
+        metrics.log_scalar('loss', loss_sum / sample_size / math.log(2), sample_size, round=3)
+        if sample_size != ntokens:
+            metrics.log_scalar('nll_loss', loss_sum / ntokens / math.log(2), ntokens, round=3)
+
+        if len(logging_outputs) > 0 and 'ncorrect' in logging_outputs[0]:
+            ncorrect = sum(log.get('ncorrect', 0) for log in logging_outputs)
+            metrics.log_scalar('accuracy', 100.0 * ncorrect / nsentences, nsentences, round=1)
+
+    @staticmethod
+    def logging_outputs_can_be_summed() -> bool:
+        """
+        Whether the logging outputs returned by `forward` can be summed
+        across workers prior to calling `reduce_metrics`. Setting this
+        to True will improves distributed training speed.
+        """
+        return True
