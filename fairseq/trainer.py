@@ -558,7 +558,7 @@ class Trainer(object):
     def lr_step_update(self):
         """Update the learning rate after each update."""
         new_lr = self.lr_scheduler.step_update(self.get_num_updates())
-        metrics.log_scalar("lr", new_lr, weight=0, priority=300)
+        metrics.log_scalar("lr", new_lr, weight=0, priority=300, round=6)
         return new_lr
 
     def get_lr(self):
