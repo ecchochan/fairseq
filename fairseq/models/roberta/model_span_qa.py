@@ -168,6 +168,7 @@ class RobertaQAEncoder(FairseqDecoder):
 
     def forward(self, src_tokens, features_only=False, return_all_hiddens=False, cls_index=None, **unused):
         x, extra = self.extract_features(src_tokens, return_all_hiddens)
+        x = x.transpose(0,1)
         if not features_only:
             start_logits, end_logits = self.span_logits(x).split(1, dim=-1)
             cls_logits = self.answer_class(x, cls_index=cls_index)
