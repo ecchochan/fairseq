@@ -125,7 +125,7 @@ class RobertaQAModel(FairseqLanguageModel):
             args.max_positions = args.tokens_per_sample
 
         encoder = RobertaQAEncoder(args, task.source_dictionary)
-        if cls.args.mixout:
+        if args.mixout:
             encoder = encoder.apply(MixoutWrapper)
         return cls(args, encoder)
 
