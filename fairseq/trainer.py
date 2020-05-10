@@ -211,10 +211,17 @@ class Trainer(object):
                         state["criterion"], strict=True
                     )
             except Exception:
-                raise Exception(
+                print(
                     "Cannot load model parameters from checkpoint {}; "
                     "please ensure that the architectures match.".format(filename)
                 )
+                try:
+                    print('!!! Training Continued Ignoring The Above Error !!!')
+                    self.get_model().load_state_dict(state['model'], strict=False)
+                    if utils.has_parameters(self.get_criterion()):
+                        self.get_criterion().load_state_dict(state['criterion'], strict=False)
+                except:
+                    raise Exception('version is %s'%(sys.version_info, ))
 
             extra_state = state["extra_state"]
             self._optim_history = state["optimizer_history"]
