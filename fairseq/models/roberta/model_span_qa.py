@@ -11,6 +11,13 @@ from fairseq.modules import (
     TransformerSentenceEncoder,
 )
 
+from fairseq.models import (
+    FairseqDecoder,
+    FairseqLanguageModel,
+    register_model,
+    register_model_architecture,
+)
+
 def MixoutWrapper(module: nn.Module, p: float = 0.5):
     """
     Implementation of Mixout (https://arxiv.org/abs/1909.11299).
