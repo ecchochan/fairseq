@@ -160,7 +160,7 @@ class SQuAD2Task(FairseqTask):
         
         lengths = []
 
-        data = from_records(path, self.args.max_seq_lengths)
+        data = from_records(path, self.args.max_seq_length)
         
         for inp, start, end, unanswerable in data:
             tokens.append(inp)
