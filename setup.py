@@ -64,7 +64,7 @@ extensions = [
         language='c++',
         extra_compile_args=extra_compile_args,
     ),
-    cythonize('fstokenizers/*.pyx', 
+    cythonize('fairseq/fstokenizers/*.pyx', 
         compiler_directives={
             'boundscheck': False, 
             'wraparound':False, 
