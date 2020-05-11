@@ -8,8 +8,9 @@ import os
 from setuptools import setup, find_packages, Extension
 import sys
 
+
 if sys.version_info < (3, 6):
-    sys.exit('Sorry, Python >= 3.6 is required for fairseq. (using %r)'%(sys.version_info,))
+    sys.exit('Sorry, Python >= 3.6 is required for fairseq.')
 
 
 with open('README.md') as f:
@@ -32,7 +33,7 @@ class NumpyExtension(Extension):
     @property
     def include_dirs(self):
         import numpy
-        return self.__include_dirs + [numpy.get_include()] + ["."]
+        return self.__include_dirs + [numpy.get_include()]
 
     @include_dirs.setter
     def include_dirs(self, dirs):
@@ -60,20 +61,8 @@ extensions = [
         language='c++',
         extra_compile_args=extra_compile_args,
     ),
-    Extension(
-        "fairseq.fstokenizers_utils", 
-        extra_compile_args=[],
-        sources=['fairseq/fstokenizers/%s'%e for e in ['lang_utils.pyx', 'pyrobuf_list.pyx', 'pyrobuf_util.pyx', 'sentencepiece_proto.pyx']]
-    ),
-    Extension(
-        "fairseq.fstokenizers", 
-        extra_compile_args=[],
-        language="c++",
-        sources=['fairseq/fstokenizers/%s'%e for e in ['tokenization.pyx']]
-    )
 ]
 
-    
 
 cmdclass = {}
 
@@ -152,7 +141,6 @@ setup(
         'sacrebleu',
         'torch',
         'tqdm',
-        'sentencepiece',
     ],
     dependency_links=dependency_links,
     packages=find_packages(exclude=['scripts', 'tests']),
