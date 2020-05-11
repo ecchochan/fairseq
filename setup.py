@@ -32,7 +32,7 @@ class NumpyExtension(Extension):
     @property
     def include_dirs(self):
         import numpy
-        return self.__include_dirs + [numpy.get_include()]
+        return self.__include_dirs + [numpy.get_include()] + ["."]
 
     @include_dirs.setter
     def include_dirs(self, dirs):
