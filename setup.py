@@ -10,7 +10,6 @@ import os
 from setuptools import setup, find_packages, Extension
 import sys
 
-print(sys.version_info)
 if sys.version_info < (3, 6):
     sys.exit('Sorry, Python >= 3.6 is required for fairseq. (using %r)'%(sys.version_info,))
 
@@ -34,7 +33,10 @@ class NumpyExtension(Extension):
 
     @property
     def include_dirs(self):
-        import numpy
+        try:
+            import numpy
+        except:
+            raise Exception("%r"%sys.version_info)
         return self.__include_dirs + [numpy.get_include()]
 
     @include_dirs.setter
