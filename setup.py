@@ -63,19 +63,7 @@ extensions = [
         language='c++',
         extra_compile_args=extra_compile_args,
     )
-] + cythonize([
-        Extension(
-            "fairseq.fstokenizers", 
-            ['fairseq/fstokenizers/*.pyx'],
-            define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
-        )
-    ], compiler_directives={
-            'boundscheck': False, 
-            'wraparound':False, 
-            'initializedcheck': False,
-            'infer_types': True
-        }
-    )
+]
     
 
 cmdclass = {}
