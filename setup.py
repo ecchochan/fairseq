@@ -4,6 +4,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+from Cython.Build import cythonize
+
 import os
 from setuptools import setup, find_packages, Extension
 import sys
@@ -60,9 +62,21 @@ extensions = [
         sources=['fairseq/data/token_block_utils_fast.pyx'],
         language='c++',
         extra_compile_args=extra_compile_args,
-    ),
-]
-
+    )
+] + cythonize([
+        Extension(
+            "fairseq.fstokenizers", 
+            ['fairseq/fstokenizers/*.pyx'],
+            define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
+        )
+    ], compiler_directives={
+            'boundscheck': False, 
+            'wraparound':False, 
+            'initializedcheck': False,
+            'infer_types': True
+        }
+    )
+    
 
 cmdclass = {}
 
