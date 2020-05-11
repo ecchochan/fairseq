@@ -9,9 +9,8 @@ from Cython.Build import cythonize
 import os
 from setuptools import setup, find_packages, Extension
 import sys
-import numpy
 
-
+print(sys.version_info)
 if sys.version_info < (3, 6):
     sys.exit('Sorry, Python >= 3.6 is required for fairseq. (using %r)'%(sys.version_info,))
 
@@ -35,6 +34,7 @@ class NumpyExtension(Extension):
 
     @property
     def include_dirs(self):
+        import numpy
         return self.__include_dirs + [numpy.get_include()]
 
     @include_dirs.setter
