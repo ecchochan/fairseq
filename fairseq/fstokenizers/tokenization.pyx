@@ -560,9 +560,9 @@ class DocTokens():
 
 import sentencepiece as spm
 
-from sentencepiece_proto cimport SentencePieceText, SentencePieceTextSentencePiece
-from pyrobuf_list cimport *
-from pyrobuf_util cimport *
+from .sentencepiece_proto cimport SentencePieceText, SentencePieceTextSentencePiece
+from .pyrobuf_list cimport *
+from .pyrobuf_util cimport *
 SPIECE_UNDERLINE = '▁'
 from libc.math cimport ceil
 ctypedef pair[int, int] int_pair

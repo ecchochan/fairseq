@@ -147,6 +147,7 @@ setup(
         'sacrebleu',
         'torch',
         'tqdm',
+        'sentencepiece',
     ],
     dependency_links=dependency_links,
     packages=find_packages(exclude=['scripts', 'tests']),
