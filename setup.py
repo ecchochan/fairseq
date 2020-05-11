@@ -4,7 +4,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 from Cython.Build import cythonize
 
 import os
@@ -64,8 +63,11 @@ extensions = [
         language='c++',
         extra_compile_args=extra_compile_args,
     )
-] + cythonize('fairseq/fstokenizers/*.pyx', 
-        compiler_directives={
+] + cythonize([
+        Extension("fairseq.fstokenizers", ['fairseq/fstokenizers/*.pyx'],
+        define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
+        )
+    ], compiler_directives={
             'boundscheck': False, 
             'wraparound':False, 
             'initializedcheck': False,
