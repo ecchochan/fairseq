@@ -54,7 +54,7 @@ def get_decayed_param_groups(named_parameters,
           factor = lr_decay**(num_layers-layer)
 
         param['lr'] = lr * factor
-        print(k+':', factor)
+        #print(k+':', factor)
         
       lr_factors.append(param)
   return lr_factors
