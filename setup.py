@@ -63,8 +63,6 @@ extensions = [
     NumpyExtension(
         "fairseq.fstokenizers", 
         sources=['fairseq/fstokenizers/%s'%e for e in ['lang_utils.pyx', 'pyrobuf_list.pyx', 'pyrobuf_util.pyx', 'sentencepiece_proto.pyx', 'tokenization.pyx']] ,
-        language='c++',
-        extra_compile_args=extra_compile_args,
         define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
     )
 ]
