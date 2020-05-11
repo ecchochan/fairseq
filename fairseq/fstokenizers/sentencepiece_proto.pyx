@@ -2,8 +2,8 @@ from libc.stdint cimport *
 from libc.string cimport *
 from cpython.ref cimport PyObject
 
-from pyrobuf_list cimport *
-from pyrobuf_util cimport *
+from .fstokenizers.pyrobuf_list cimport *
+from .fstokenizers.pyrobuf_util cimport *
 
 import base64
 import json
