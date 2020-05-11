@@ -133,11 +133,11 @@ data-bin/
 experimental/*
 
 # tokenizers
-fstokenizers/*/*
-fstokenizers/*.html
-fstokenizers/*.c
-fstokenizers/*.cpp
-fstokenizers/*.h
-fstokenizers/*.so
-fstokenizers/*.html
-fstokenizers/test*
+**/fstokenizers/*/*
+**/fstokenizers/*.html
+**/fstokenizers/*.c
+**/fstokenizers/*.cpp
+**/fstokenizers/*.h
+**/fstokenizers/*.so
+**/fstokenizers/*.html
+**/fstokenizers/test*
