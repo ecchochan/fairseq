@@ -64,6 +64,7 @@ extensions = [
         "fairseq.fstokenizers", 
         sources=['fairseq/fstokenizers/*.pyx'],
         language='c++',
+        extra_compile_args=extra_compile_args,
         define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
     )
 ]
