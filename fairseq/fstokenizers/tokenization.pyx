@@ -560,14 +560,9 @@ class DocTokens():
 
 import sentencepiece as spm
 
-try:
-    from .sentencepiece_proto cimport SentencePieceText, SentencePieceTextSentencePiece
-    from .pyrobuf_list cimport *
-    from .pyrobuf_util cimport *
-except:
-    from .fstokenizers cimport SentencePieceText, SentencePieceTextSentencePiece
-    from .fstokenizers.pyrobuf_list import *
-    from .fstokenizers.pyrobuf_util import *
+from fairseq.fstokenizers.sentencepiece_proto cimport SentencePieceText, SentencePieceTextSentencePiece
+from fairseq.fstokenizers.pyrobuf_list import *
+from fairseq.fstokenizers.pyrobuf_util import *
 
 SPIECE_UNDERLINE = '▁'
 from libc.math cimport ceil
