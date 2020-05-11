@@ -36,7 +36,7 @@ class NumpyExtension(Extension):
         try:
             import numpy
         except:
-            raise Exception("%r"%sys.version_info)
+            raise Exception("%r"%(sys.version_info,))
         return self.__include_dirs + [numpy.get_include()]
 
     @include_dirs.setter
