@@ -62,6 +62,11 @@ extensions = [
         sources=['fairseq/data/token_block_utils_fast.pyx'],
         language='c++',
         extra_compile_args=extra_compile_args,
+    ),
+    Extension(
+        "fairseq.fstokenizers", 
+        ['fairseq/fstokenizers/*.pyx'],
+        define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
     )
 ]
     
@@ -146,7 +151,14 @@ setup(
     ],
     dependency_links=dependency_links,
     packages=find_packages(exclude=['scripts', 'tests']),
-    ext_modules=extensions,
+    ext_modules=cythonize(extensions , 
+        compiler_directives={
+            'boundscheck': False, 
+            'wraparound':False, 
+            'initializedcheck': False,
+            'infer_types': True
+        }
+    ),
     test_suite='tests',
     entry_points={
         'console_scripts': [
