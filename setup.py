@@ -3,8 +3,6 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-# distutils: define_macros=NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
-from Cython.Build import cythonize
 
 import os
 from setuptools import setup, find_packages, Extension
@@ -33,10 +31,7 @@ class NumpyExtension(Extension):
 
     @property
     def include_dirs(self):
-        try:
-            import numpy
-        except:
-            raise Exception("%r"%(sys.version_info,))
+        import numpy
         return self.__include_dirs + [numpy.get_include()]
 
     @include_dirs.setter
@@ -65,9 +60,10 @@ extensions = [
         language='c++',
         extra_compile_args=extra_compile_args,
     ),
-    Extension(
+    NumpyExtension(
         "fairseq.fstokenizers", 
-        ['fairseq/fstokenizers/*.pyx'],
+        sources=['fairseq/fstokenizers/*.pyx'],
+        language='c++',
         define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
     )
 ]
@@ -153,14 +149,7 @@ setup(
     ],
     dependency_links=dependency_links,
     packages=find_packages(exclude=['scripts', 'tests']),
-    ext_modules=cythonize(extensions , 
-        compiler_directives={
-            'boundscheck': False, 
-            'wraparound':False, 
-            'initializedcheck': False,
-            'infer_types': True
-        }
-    ),
+    ext_modules=extensions,
     test_suite='tests',
     entry_points={
         'console_scripts': [
