@@ -67,8 +67,6 @@ class RobertaQAModel(FairseqLanguageModel):
                             help='dropout probability in the masked_lm pooler layers')
         parser.add_argument('--max-positions', type=int,
                             help='number of positional embeddings to learn')
-        parser.add_argument('--max-seq-lengths', type=int,
-                            help='maximum number of input tokens')
         parser.add_argument('--load-checkpoint-heads', action='store_true',
                             help='(re-)register and load heads when loading checkpoints')
         parser.add_argument('--mixout', type=float, metavar='D',
