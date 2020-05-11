@@ -134,8 +134,6 @@ class SQuAD2Task(FairseqTask):
         parser.add_argument('data', help='colon separated path to data directories list, \
                             will be iterated upon during epochs in round-robin manner')
         parser.add_argument('--do_shuffle', action='store_true', default=False)
-        parser.add_argument('--max_seq_lengths', type=int,
-                            help='maximum number of input tokens')
         #max_positions
 
     def __init__(self, args, dictionary):
