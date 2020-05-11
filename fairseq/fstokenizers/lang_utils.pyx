@@ -1,4 +1,4 @@
-
+#cython: language_level=3, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True
 
 cimport cython
 cdef int UNICODE_LANG_MAP[1114112]

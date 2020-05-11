@@ -1,3 +1,4 @@
+#cython: language_level=3, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True
 from libc.stdint cimport *
 from libc.string cimport *
 from cpython.ref cimport PyObject

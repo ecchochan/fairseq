@@ -1,3 +1,4 @@
+#cython: language_level=3, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from libc.stdint cimport *
 from cpython.ref cimport PyObject
