@@ -20,6 +20,7 @@ setup(ext_modules = cythonize('*.pyx',
 
 
 '''
+python3 cythonize.py build_ext --inplace
 python3.6 cythonize.py build_ext --inplace
 python3.5 cythonize.py build_ext --inplace
 '''

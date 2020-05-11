@@ -3,8 +3,8 @@ from libc.stdint cimport *
 from libc.string cimport *
 from cpython.ref cimport PyObject
 
-from fairseq.fstokenizers.pyrobuf_list import *
-from fairseq.fstokenizers.pyrobuf_util import *
+from fairseq.fstokenizers.pyrobuf_list cimport *
+from fairseq.fstokenizers.pyrobuf_util cimport *
 
 import json
 
