@@ -63,7 +63,14 @@ extensions = [
     Extension(
         "fairseq.fstokenizers", 
         extra_compile_args=[],
-        sources=['fairseq/fstokenizers/%s'%e for e in ['lang_utils.pyx', 'pyrobuf_list.pyx', 'pyrobuf_util.pyx', 'sentencepiece_proto.pyx', 'tokenization.pyx']]
+        language="c++",
+        sources=['fairseq/fstokenizers/%s'%e for e in ['lang_utils.pyx', 'pyrobuf_list.pyx', 'pyrobuf_util.pyx', 'sentencepiece_proto.pyx']]
+    ),
+    Extension(
+        "fairseq.fstokenizers", 
+        extra_compile_args=[],
+        language="c++",
+        sources=['fairseq/fstokenizers/%s'%e for e in ['tokenization.pyx']]
     )
 ]
 
