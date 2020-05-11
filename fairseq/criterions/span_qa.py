@@ -58,7 +58,7 @@ class SQuAD2Criterion(FairseqCriterion):
             'sample_size': sample_size,
         }
         logging_output['ncorrect'] = ((start_logits.argmax(-1) == start_positions).sum() + (end_logits.argmax(-1) == end_positions).sum()) / 2
-        logging_output['ncorrect-n'] = ((cls_logits == unanswerable).sum())
+        logging_output['ncorrect-n'] = (((cls_logits > 0.5) == (cls_logits > 0.5)).sum())
         return total_loss, sample_size, logging_output
 
     @staticmethod
