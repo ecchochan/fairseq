@@ -63,8 +63,8 @@ extensions = [
         sources=['fairseq/data/token_block_utils_fast.pyx'],
         language='c++',
         extra_compile_args=extra_compile_args,
-    ),
-    cythonize('fairseq/fstokenizers/*.pyx', 
+    )
+] + cythonize('fairseq/fstokenizers/*.pyx', 
         compiler_directives={
             'boundscheck': False, 
             'wraparound':False, 
@@ -72,7 +72,6 @@ extensions = [
             'infer_types': True
         }
     )
-]
 
 
 cmdclass = {}
