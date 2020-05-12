@@ -245,7 +245,7 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets):
     if do_validate:
         valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
     # Save
-    if do_save:
+    if do_save and valid_losses:
         checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
     return valid_losses
 
