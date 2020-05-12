@@ -105,7 +105,8 @@ class RobertaQAModel(FairseqLanguageModel):
         from functools import partial
         if hasattr(self.args, 'pooler_mixout') and self.args.pooler_mixout > 0:
             self.decoder.span_logits.apply(partial(MixoutWrapper, p=self.args.pooler_mixout))
-            self.decoder.answer_class.apply(partial(MixoutWrapper, p=self.args.pooler_mixout))
+            if not self.args.no_pooler:
+                self.decoder.answer_class.apply(partial(MixoutWrapper, p=self.args.pooler_mixout))
 
         if hasattr(self.args, 'mixout') and self.args.mixout > 0:
             self.decoder.sentence_encoder.apply(partial(MixoutWrapper, p=self.args.mixout))
