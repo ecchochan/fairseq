@@ -243,10 +243,16 @@ class Trainer(object):
         bexists = PathManager.isfile(filename)
         if bexists:
             state = checkpoint_utils.load_checkpoint_to_cpu(filename)
+            args = state['args']
 
             # load model parameters
+            model = self.get_model()
+
+            if hasattr(args, 'mixout') and args.mixout > 0:
+                model.apply_mixout(args.mixout)
+
             try:
-                self.get_model().load_state_dict(
+                model.load_state_dict(
                     state["model"], strict=True, args=self.args
                 )
                 if utils.has_parameters(self.get_criterion()):

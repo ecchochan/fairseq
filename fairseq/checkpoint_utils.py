@@ -208,6 +208,10 @@ def load_model_ensemble_and_task(filenames, arg_overrides=None, task=None, stric
 
         # build model for ensemble
         model = task.build_model(args)
+        
+        if hasattr(args, 'mixout') and args.mixout > 0:
+            model.apply_mixout(args.mixout)
+            
         model.load_state_dict(state["model"], strict=strict, args=args)
         ensemble.append(model)
     return ensemble, args, task
