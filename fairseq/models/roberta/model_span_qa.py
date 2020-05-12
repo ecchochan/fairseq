@@ -73,7 +73,10 @@ class RobertaQAModel(FairseqLanguageModel):
                             help='mixout probability')
         parser.add_argument('--pooler-mixout', type=float, metavar='D',
                             help='dropout probability in the masked_lm pooler layers')
+        parser.add_argument('--no-pooler', default=False, type=bool)
 
+
+                            
     @classmethod
     def build_model(cls, args, task):
         """Build a new model instance."""
@@ -194,16 +197,20 @@ class RobertaQAEncoder(FairseqDecoder):
             activation_fn=args.activation_fn,
         )
         self.span_logits =  nn.Linear(args.encoder_embed_dim, 2)
-        self.answer_class = PoolerAnswerClass(args.encoder_embed_dim, args.pooler_dropout)
+        
+        if not args.no_pooler:
+            self.answer_class = PoolerAnswerClass(args.encoder_embed_dim, args.pooler_dropout)
 
     def forward(self, src_tokens, features_only=False, return_all_hiddens=False, cls_index=None, **unused):
         x, extra = self.extract_features(src_tokens, return_all_hiddens)
         x = x.transpose(0,1)
         if not features_only:
             start_logits, end_logits = self.span_logits(x).split(1, dim=-1)
-            cls_logits = self.answer_class(x, cls_index=cls_index)
-            x = (start_logits, end_logits, cls_logits)
-            
+            if not self.args.no_pooler:
+                cls_logits = self.answer_class(x, cls_index=cls_index)
+                x = (start_logits, end_logits, cls_logits)
+            else:
+                x = (start_logits, end_logits)
             
         return x, extra
 

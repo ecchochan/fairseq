@@ -18,8 +18,8 @@ class SQuAD2Criterion(FairseqCriterion):
     @staticmethod
     def add_args(parser):
         # fmt: off
-        parser.add_argument('--save-predictions', metavar='FILE',
-                            help='file to save predictions to')
+        parser.add_argument('--na-loss-weight', default=1.0, type=float)
+        
         # fmt: on
 
     def forward(self, model, sample, reduce=True):
@@ -29,11 +29,15 @@ class SQuAD2Criterion(FairseqCriterion):
         end_positions = sample['ends']
         unanswerable = sample['unanswerables']
         
-        (start_logits, end_logits, cls_logits), extra = model(tokens) 
+        if model.args.no_pooler:
+            (start_logits, end_logits), extra = model(tokens) 
+        else:
+            (start_logits, end_logits, cls_logits), extra = model(tokens) 
+
+
         start_logits = start_logits.squeeze(-1)   # -> B T H
         end_logits = end_logits.squeeze(-1)
         
-
         for x in (start_positions, end_positions, unanswerable):
             if x is not None and x.dim() > 1:
                 x.squeeze_(-1)
@@ -44,10 +48,11 @@ class SQuAD2Criterion(FairseqCriterion):
         total_loss = (start_loss + end_loss) / 2
 
 
-        loss_fct_cls = nn.BCEWithLogitsLoss()
-        cls_loss = loss_fct_cls(cls_logits, unanswerable)
-        
-        total_loss += cls_loss * 0.5
+        if not model.args.no_pooler:
+            loss_fct_cls = nn.BCEWithLogitsLoss()
+            cls_loss = loss_fct_cls(cls_logits, unanswerable) * 0.5
+            
+            total_loss += cls_loss * self.args.na_loss_weight
 
 
         sample_size = tokens.size(0) 
