@@ -208,11 +208,14 @@ def load_model_ensemble_and_task(filenames, arg_overrides=None, task=None, stric
 
         # build model for ensemble
         model = task.build_model(args)
-        
+        states = state["model"]
         if hasattr(args, 'mixout') and args.mixout > 0:
-            model.apply_mixout(args.mixout)
+            for k, v in list(states.items()):
+                if '._params_learned' in k:
+                    del states[k]
+                    states[k.replace('._params_learned','')] = v
             
-        model.load_state_dict(state["model"], strict=strict, args=args)
+        model.load_state_dict(states, strict=strict, args=args)
         ensemble.append(model)
     return ensemble, args, task
 

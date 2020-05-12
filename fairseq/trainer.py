@@ -248,12 +248,16 @@ class Trainer(object):
             # load model parameters
             model = self.get_model()
 
+            states = state["model"]
             if hasattr(args, 'mixout') and args.mixout > 0:
-                model.apply_mixout(args.mixout)
+                for k, v in list(states.items()):
+                    if '._params_learned' in k:
+                        del states[k]
+                        states[k.replace('._params_learned','')] = v
 
             try:
                 model.load_state_dict(
-                    state["model"], strict=True, args=self.args
+                    states, strict=True, args=self.args
                 )
                 if utils.has_parameters(self.get_criterion()):
                     self.get_criterion().load_state_dict(
