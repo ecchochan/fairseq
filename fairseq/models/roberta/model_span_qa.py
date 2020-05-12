@@ -71,6 +71,8 @@ class RobertaQAModel(FairseqLanguageModel):
                             help='(re-)register and load heads when loading checkpoints')
         parser.add_argument('--mixout', type=float, metavar='D',
                             help='mixout probability')
+        parser.add_argument('--pooler-mixout', type=float, metavar='D',
+                            help='dropout probability in the masked_lm pooler layers')
 
     @classmethod
     def build_model(cls, args, task):
@@ -81,6 +83,13 @@ class RobertaQAModel(FairseqLanguageModel):
 
         if not hasattr(args, 'max_positions'):
             args.max_positions = args.tokens_per_sample
+        if hasattr(args, 'mixout') and args.mixout > 0:
+            self.dropout = 0
+            self.attention_dropout = 0
+            self.activation_dropout = 0
+            
+        if hasattr(args, 'pooler_mixout') and args.pooler_mixout > 0:
+            self.pooler_dropout = 0
 
         encoder = RobertaQAEncoder(args, task.source_dictionary)
         return cls(args, encoder)
@@ -88,10 +97,15 @@ class RobertaQAModel(FairseqLanguageModel):
     def forward(self, *args, **kwargs):
         return self.decoder(*args, **kwargs)
         
-    def apply_mixout(self, p):
+    def apply_mixout(self):
         from fairseq.optim.mixout import MixoutWrapper
         from functools import partial
-        self.decoder.sentence_encoder.apply(partial(MixoutWrapper, p=p))
+        if hasattr(self.args, 'pooler_mixout') and self.args.pooler_mixout > 0:
+            self.decoder.span_logits.apply(partial(MixoutWrapper, p=self.args.pooler_mixout))
+            self.decoder.answer_class.apply(partial(MixoutWrapper, p=self.args.pooler_mixout))
+
+        if hasattr(self.args, 'mixout') and self.args.mixout > 0:
+            self.decoder.sentence_encoder.apply(partial(MixoutWrapper, p=self.args.mixout))
 
     @property
     def supported_targets(self):

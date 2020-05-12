@@ -104,7 +104,7 @@ def main(args, init_distributed=False):
     extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
 
     if hasattr(args, 'mixout') and args.mixout > 0:
-        model = model.apply_mixout(args.mixout)
+        model = model.apply_mixout()
 
     # Train until the learning rate gets too small
     max_epoch = args.max_epoch or math.inf
