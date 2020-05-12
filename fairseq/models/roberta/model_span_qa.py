@@ -84,12 +84,12 @@ class RobertaQAModel(FairseqLanguageModel):
         if not hasattr(args, 'max_positions'):
             args.max_positions = args.tokens_per_sample
         if hasattr(args, 'mixout') and args.mixout > 0:
-            self.dropout = 0
-            self.attention_dropout = 0
-            self.activation_dropout = 0
+            args.dropout = 0
+            args.attention_dropout = 0
+            args.activation_dropout = 0
             
         if hasattr(args, 'pooler_mixout') and args.pooler_mixout > 0:
-            self.pooler_dropout = 0
+            args.pooler_dropout = 0
 
         encoder = RobertaQAEncoder(args, task.source_dictionary)
         return cls(args, encoder)
