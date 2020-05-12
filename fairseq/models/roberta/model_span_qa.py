@@ -85,11 +85,8 @@ class RobertaQAModel(FairseqLanguageModel):
         encoder = RobertaQAEncoder(args, task.source_dictionary)
         return cls(args, encoder)
 
-    def forward(self, src_tokens, features_only=False, return_all_hiddens=False, **kwargs):
-
-        x, extra = self.decoder(src_tokens, features_only, return_all_hiddens, **kwargs)
-
-        return x, extra
+    def forward(self, *args, **kwargs):
+        return self.decoder(*args, **kwargs)
         
     def apply_mixout(self, p):
         from fairseq.optim.mixout import MixoutWrapper
@@ -113,6 +110,21 @@ class RobertaQAModel(FairseqLanguageModel):
             **kwargs,
         )
         return RobertaHubInterface(x['args'], x['task'], x['models'][0])
+
+    def load_pretrained(self, checkpoint_file='model.pt'):
+        state = torch.load(checkpoint_file)
+        states = state["model"]
+        for k, v in list(states.items()):
+            new_k = k.replace('module.','')
+            if '._params_learned' in k:
+                new_k = new_k.replace('._params_learned','')
+            del states[k]
+            states[new_k] = v
+
+        self.load_state_dict(states, strict=True)
+
+                    
+                    
 
 
 class PoolerAnswerClass(nn.Module):
