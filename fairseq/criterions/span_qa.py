@@ -52,7 +52,7 @@ class SQuAD2Criterion(FairseqCriterion):
             loss_fct_cls = nn.BCEWithLogitsLoss()
             cls_loss = loss_fct_cls(cls_logits, unanswerable) * 0.5
             
-            total_loss += cls_loss * self.args.na_loss_weight
+            total_loss += cls_loss * model.args.na_loss_weight
 
 
         sample_size = tokens.size(0) 
