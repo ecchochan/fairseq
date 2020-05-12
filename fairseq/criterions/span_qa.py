@@ -35,7 +35,7 @@ class SQuAD2Criterion(FairseqCriterion):
             (start_logits, end_logits, cls_logits), extra = model(tokens) 
 
 
-        start_logits = start_logits.squeeze(-1)   # -> B T H
+        start_logits = start_logits.squeeze(-1)   # -> B T 1
         end_logits = end_logits.squeeze(-1)
         
         for x in (start_positions, end_positions, unanswerable):
