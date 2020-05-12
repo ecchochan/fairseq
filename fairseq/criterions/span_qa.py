@@ -63,7 +63,8 @@ class SQuAD2Criterion(FairseqCriterion):
             'sample_size': sample_size,
         }
         logging_output['ncorrect'] = ((start_logits.argmax(-1) == start_positions).sum() + (end_logits.argmax(-1) == end_positions).sum()) / 2
-        logging_output['ncorrect-n'] = (((cls_logits > 0.5) == (unanswerable > 0.5)).sum())
+        if not model.args.no_pooler:
+            logging_output['ncorrect-n'] = (((cls_logits > 0.5) == (unanswerable > 0.5)).sum())
         return total_loss, sample_size, logging_output
 
     @staticmethod
@@ -80,8 +81,8 @@ class SQuAD2Criterion(FairseqCriterion):
 
         if len(logging_outputs) > 0 and 'ncorrect' in logging_outputs[0]:
             ncorrect = sum(log.get('ncorrect', 0) for log in logging_outputs)
-            ncorrect_n = sum(log.get('ncorrect-n', 0) for log in logging_outputs)
             metrics.log_scalar('accuracy', 100.0 * ncorrect / nsentences, nsentences, round=1)
+            ncorrect_n = sum(log.get('ncorrect-n', 0) for log in logging_outputs)
             metrics.log_scalar('accuracy-n', 100.0 * ncorrect_n / nsentences, nsentences, round=1)
 
     @staticmethod
