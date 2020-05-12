@@ -162,16 +162,16 @@ class SQuAD2Task(FairseqTask):
 
         try:
             data = from_records(path, self.args.max_seq_length)
+        
+            for inp, start, end, unanswerable in data:
+                tokens.append(inp)
+                lengths.append(len(inp))
+                starts.append(start)
+                ends.append(end)
+                unanswerables.append(unanswerable)
+                
         except:
             data = []
-        
-        for inp, start, end, unanswerable in data:
-            tokens.append(inp)
-            lengths.append(len(inp))
-            starts.append(start)
-            ends.append(end)
-            unanswerables.append(unanswerable)
-            
         
         tokens = BaseWrapperDataset(tokens)
         starts = BaseWrapperDataset(np.array(starts, dtype=np.long))
