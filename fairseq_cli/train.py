@@ -184,6 +184,8 @@ def train(args, trainer, task, epoch_itr, max_update=math.inf):
 
     trainer.begin_epoch(epoch_itr.epoch)
 
+    num_updates = 0
+    valid_losses = [None]
     valid_subsets = args.valid_subset.split(',')
     for samples in progress:
         with metrics.aggregate('train_inner'):
