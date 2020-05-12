@@ -73,7 +73,7 @@ class RobertaQAModel(FairseqLanguageModel):
                             help='mixout probability')
         parser.add_argument('--pooler-mixout', type=float, metavar='D',
                             help='dropout probability in the masked_lm pooler layers')
-        parser.add_argument('--no-pooler', default=False, type=bool)
+        parser.add_argument('--no-pooler', default=0, type=int)
 
 
                             
