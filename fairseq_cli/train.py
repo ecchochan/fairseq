@@ -304,7 +304,10 @@ def validate(args, trainer, task, epoch_itr, subsets):
         stats = get_valid_stats(args, trainer, agg.get_smoothed_values())
         progress.print(stats, tag=subset, step=trainer.get_num_updates())
 
-        valid_losses.append(stats[args.best_checkpoint_metric])
+        if args.best_checkpoint_metric in stats:
+            valid_losses.append(stats[args.best_checkpoint_metric])
+        else:
+            print(args.best_checkpoint_metric, 'not found in validation stats.')
     return valid_losses
 
 
