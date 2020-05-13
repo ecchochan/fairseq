@@ -118,7 +118,7 @@ def main(args, init_distributed=False):
     ):
         # train for one epoch
         valid_losses = train(args, trainer, task, epoch_itr, max_update)
-        if should_stop_early(args, valid_losses[0]) or trainer.get_num_updates() >= max_update:
+        if (valid_losses and should_stop_early(args, valid_losses[0])) or trainer.get_num_updates() >= max_update:
             break
 
         # only use first validation loss to update the learning rate
@@ -204,7 +204,7 @@ def train(args, trainer, task, epoch_itr, max_update=math.inf):
             metrics.reset_meters('train_inner')
 
         valid_losses = validate_and_save(args, trainer, task, epoch_itr, valid_subsets)
-        if valid_losses and should_stop_early(args, valid_losses[0]) or num_updates >= max_update:
+        if (valid_losses and should_stop_early(args, valid_losses[0])) or num_updates >= max_update:
             break
 
     # log end-of-epoch stats
