@@ -122,7 +122,7 @@ def main(args, init_distributed=False):
             break
 
         # only use first validation loss to update the learning rate
-        lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0])
+        lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0] if valid_losses else None)
 
         epoch_itr = trainer.get_train_iterator(
             epoch_itr.next_epoch_idx,
