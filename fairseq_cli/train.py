@@ -118,11 +118,11 @@ def main(args, init_distributed=False):
     ):
         # train for one epoch
         valid_losses = train(args, trainer, task, epoch_itr, max_update)
-        if (valid_losses and should_stop_early(args, valid_losses[0])) or trainer.get_num_updates() >= max_update:
+        if should_stop_early(args, valid_losses[0]) or trainer.get_num_updates() >= max_update:
             break
 
         # only use first validation loss to update the learning rate
-        lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0] if valid_losses else None)
+        lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0])
 
         epoch_itr = trainer.get_train_iterator(
             epoch_itr.next_epoch_idx,
@@ -184,8 +184,6 @@ def train(args, trainer, task, epoch_itr, max_update=math.inf):
 
     trainer.begin_epoch(epoch_itr.epoch)
 
-    num_updates = 0
-    valid_losses = [None]
     valid_subsets = args.valid_subset.split(',')
     for samples in progress:
         with metrics.aggregate('train_inner'):
@@ -204,7 +202,7 @@ def train(args, trainer, task, epoch_itr, max_update=math.inf):
             metrics.reset_meters('train_inner')
 
         valid_losses = validate_and_save(args, trainer, task, epoch_itr, valid_subsets)
-        if (valid_losses and should_stop_early(args, valid_losses[0])) or num_updates >= max_update:
+        if should_stop_early(args, valid_losses[0]) or num_updates >= max_update:
             break
 
     # log end-of-epoch stats
@@ -245,7 +243,7 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets):
     if do_validate:
         valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
     # Save
-    if do_save and valid_losses:
+    if do_save:
         checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
     return valid_losses
 
@@ -304,10 +302,7 @@ def validate(args, trainer, task, epoch_itr, subsets):
         stats = get_valid_stats(args, trainer, agg.get_smoothed_values())
         progress.print(stats, tag=subset, step=trainer.get_num_updates())
 
-        if args.best_checkpoint_metric in stats:
-            valid_losses.append(stats[args.best_checkpoint_metric])
-        else:
-            print(args.best_checkpoint_metric, 'not found in validation stats.')
+        valid_losses.append(stats[args.best_checkpoint_metric])
     return valid_losses
 
 
