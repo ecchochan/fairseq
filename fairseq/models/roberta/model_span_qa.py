@@ -59,7 +59,7 @@ class RobertaQAModel(FairseqLanguageModel):
                             help='apply layernorm before each encoder block')
         parser.add_argument('--dropout', type=float, metavar='D',
                             help='dropout probability')
-        parser.add_argument('--embedding-noise', type=float, metavar='D',
+        parser.add_argument('--embedding-noise', default=0.0, type=float, metavar='D',
                             help='embedding noise added in pretraining, e.g. 0.075')
         parser.add_argument('--attention-dropout', type=float, metavar='D',
                             help='dropout probability for attention weights')
