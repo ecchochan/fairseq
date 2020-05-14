@@ -85,6 +85,7 @@ class TransformerSentenceEncoder(nn.Module):
         max_seq_len: int = 256,
         num_segments: int = 2,
         use_position_embeddings: bool = True,
+        embedding_noise: float = 0.0,
         offset_positions_by_padding: bool = True,
         encoder_normalize_before: bool = False,
         apply_bert_init: bool = False,
@@ -108,6 +109,7 @@ class TransformerSentenceEncoder(nn.Module):
         self.embedding_dim = embedding_dim
         self.num_segments = num_segments
         self.use_position_embeddings = use_position_embeddings
+        self.embedding_noise = embedding_noise
         self.apply_bert_init = apply_bert_init
         self.learned_pos_embedding = learned_pos_embedding
         self.traceable = traceable
@@ -204,6 +206,9 @@ class TransformerSentenceEncoder(nn.Module):
 
         if self.embed_positions is not None:
             x += self.embed_positions(tokens, positions=positions)
+
+        if self.embedding_noise is not None and self.embedding_noise > 0:
+            x += (self.embedding_noise**0.5)*torch.randn(tokens.size(0), tokens.size(1), self.embedding_dim).type_as(x)
 
         if self.segment_embeddings is not None and segment_labels is not None:
             x += self.segment_embeddings(segment_labels)
