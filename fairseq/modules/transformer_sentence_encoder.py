@@ -207,7 +207,7 @@ class TransformerSentenceEncoder(nn.Module):
         if self.embed_positions is not None:
             x += self.embed_positions(tokens, positions=positions)
 
-        if self.embedding_noise is not None and self.embedding_noise > 0:
+        if self.training and self.embedding_noise is not None and self.embedding_noise > 0:
             x += (self.embedding_noise)*torch.randn_like(x).type_as(x)
 
         if self.segment_embeddings is not None and segment_labels is not None:
