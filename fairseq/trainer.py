@@ -45,14 +45,15 @@ def get_decayed_param_groups(named_parameters,
       #  print('no grad:', k)
       #  v.requires_grad = False
       #  continue
-
-      if weight_decay is not None and weight_decay > 0:
-        if not any(ex in k for ex in weight_decay_exclude):
-          param['weight_decay'] = weight_decay
       
       param = {
           'params': v,
       }
+
+      if weight_decay is not None and weight_decay > 0:
+        if not any(ex in k for ex in weight_decay_exclude):
+          param['weight_decay'] = weight_decay
+          
       if lr_decay and lr_decay != 1:
         factor = 1
         if 'sentence_encoder.layers' in k:
