@@ -239,6 +239,8 @@ def get_parser(desc, default_task="translation"):
                         help='path to quantization config file')
     parser.add_argument('--lr-decay', default=1, type=float, 
                         help='Learning rate decay factor, 1.0 = no decay')
+    parser.add_argument('--weight-decay-exclude', '--wde', default='layer_norm,bias', type=str, metavar='WDE',
+                        help='weight decay excluded param names')
     parser.add_argument('--max-seq-length', type=int,
                         help='maximum number of input tokens')
 

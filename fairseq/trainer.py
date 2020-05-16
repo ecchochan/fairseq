@@ -30,9 +30,14 @@ def get_decayed_param_groups(named_parameters,
                              lr=3e-5, 
                              lr_decay=0.75, #0.908517, 
                              weight_decay=None, 
+                             weight_decay_exclude='layer_norm,bias',
                              #freeze_transformer=False
                              ):
   lr_factors = []
+  if weight_decay_exclude is not None:
+    weight_decay_exclude = weight_decay_exclude.split(',')
+
+
   for k, v in named_parameters:
       if not v.requires_grad:
         continue
@@ -40,6 +45,11 @@ def get_decayed_param_groups(named_parameters,
       #  print('no grad:', k)
       #  v.requires_grad = False
       #  continue
+
+      if weight_decay is not None and weight_decay > 0:
+        if not any(ex in k for ex in weight_decay_exclude):
+          param['weight_decay'] = weight_decay
+      
       param = {
           'params': v,
       }
@@ -49,7 +59,7 @@ def get_decayed_param_groups(named_parameters,
           layer = int(re.search(r'.layers.(\d+)',k).group(1))
           factor = lr_decay**(num_layers-layer)
 
-        elif 'embed_tokens.weight' in k or 'embed_positions' in k:
+        elif 'embed_tokens' in k or 'embed_positions' in k:
           layer = 0
           factor = lr_decay**(num_layers-layer)
 
@@ -178,6 +188,8 @@ class Trainer(object):
             params = get_decayed_param_groups(
                 chain(self.model.named_parameters(), self.criterion.named_parameters()), 
                 num_layers=self.args.encoder_layers, 
+                weight_decay=self.args.weight_decay,
+                weight_decay_exclude=self.args.weight_decay_exclude,
                 lr=float(self.args.lr[0]), 
                 lr_decay=float(self.args.lr_decay),)
         else:
