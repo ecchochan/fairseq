@@ -69,7 +69,7 @@ class RobertaMNLIModel(FairseqLanguageModel):
                             help='(re-)register and load heads when loading checkpoints')
         parser.add_argument('--mixout', type=float, metavar='D',
                             help='mixout probability')
-        parser.add_argument('--mixout-exclude', '--me', default='', type=str, 
+        parser.add_argument('--mixout-exclude', '--me', default='layer_norm', type=str, 
                             help='weight decay excluded param names')
         parser.add_argument('--pooler-mixout', type=float, metavar='D',
                             help='dropout probability in the masked_lm pooler layers')
