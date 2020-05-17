@@ -31,7 +31,7 @@ def get_decayed_param_groups(named_parameters,
                              lr_decay=0.75, #0.908517, 
                              weight_decay=None, 
                              weight_decay_exclude='layer_norm,bias',
-                             #freeze_transformer=False
+                             freeze_encoder=False
                              ):
   lr_factors = []
   if weight_decay_exclude is not None:
@@ -41,17 +41,18 @@ def get_decayed_param_groups(named_parameters,
   for k, v in named_parameters:
       if not v.requires_grad:
         continue
-      #if freeze_transformer and ('sentence_encoder.layers' in k or 'embed_tokens.weight' in k or 'embed_positions' in k):
-      #  print('no grad:', k)
-      #  v.requires_grad = False
-      #  continue
+      if freeze_encoder and ('sentence_encoder.layers' in k or 'embed_tokens' in k or 'embed_positions' in k):
+        v.requires_grad = False
+        continue
       
       param = {
           'params': v,
       }
 
       if weight_decay is not None and weight_decay > 0:
-        if not any(ex in k for ex in weight_decay_exclude):
+        if any(ex in k for ex in weight_decay_exclude):
+          param['weight_decay'] = 0
+        else:
           param['weight_decay'] = weight_decay
           
       if lr_decay and lr_decay != 1:
@@ -191,6 +192,7 @@ class Trainer(object):
                 num_layers=self.args.encoder_layers, 
                 weight_decay=self.args.weight_decay,
                 weight_decay_exclude=self.args.weight_decay_exclude,
+                freeze_encoder=self.args.freeze_encoder,
                 lr=float(self.args.lr[0]), 
                 lr_decay=float(self.args.lr_decay),)
         else:
