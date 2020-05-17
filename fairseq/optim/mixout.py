@@ -21,7 +21,7 @@ import torch
 import torch.nn as nn
 
 
-def MixoutWrapper(module: nn.Module, p: float = 0.7):
+def MixoutWrapper(module: nn.Module, p: float = 0.7, exclude: str = 'layer_norm'):
     """
     Implementation of Mixout (https://arxiv.org/abs/1909.11299).
     Use with:
@@ -31,7 +31,10 @@ def MixoutWrapper(module: nn.Module, p: float = 0.7):
     module._names = []
     module._params_orig = dict()
     _params_learned = nn.ParameterDict()
+    exclude = exclude.split(',')
     for n, q in list(module.named_parameters(recurse=False)):
+        if any(k in n for k in exclude):
+            continue
         c = q.clone().detach()
         c.requires_grad = False
         module._params_orig[n] = c

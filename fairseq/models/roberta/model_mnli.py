@@ -18,8 +18,8 @@ from fairseq.models import (
     register_model_architecture,
 )
 
-@register_model('roberta_qa')
-class RobertaQAModel(FairseqLanguageModel):
+@register_model('roberta_mnli')
+class RobertaMNLIModel(FairseqLanguageModel):
 
     @classmethod
     def hub_models(cls):
@@ -73,7 +73,6 @@ class RobertaQAModel(FairseqLanguageModel):
                             help='weight decay excluded param names')
         parser.add_argument('--pooler-mixout', type=float, metavar='D',
                             help='dropout probability in the masked_lm pooler layers')
-        parser.add_argument('--no-pooler', default=0, type=int)
 
 
                             
@@ -94,7 +93,7 @@ class RobertaQAModel(FairseqLanguageModel):
         if hasattr(args, 'pooler_mixout') and args.pooler_mixout > 0:
             args.pooler_dropout = 0
 
-        encoder = RobertaQAEncoder(args, task.source_dictionary)
+        encoder = RobertaMNLIEncoder(args, task.source_dictionary)
         return cls(args, encoder)
 
     def forward(self, *args, **kwargs):
@@ -104,9 +103,7 @@ class RobertaQAModel(FairseqLanguageModel):
         from fairseq.optim.mixout import MixoutWrapper
         from functools import partial
         if hasattr(self.args, 'pooler_mixout') and self.args.pooler_mixout > 0:
-            self.decoder.span_logits.apply(partial(MixoutWrapper, p=self.args.pooler_mixout,exclude=self.args.mixout_exclude))
-            if not self.args.no_pooler:
-                self.decoder.answer_class.apply(partial(MixoutWrapper, p=self.args.pooler_mixout,exclude=self.args.mixout_exclude))
+            self.decoder.answer_class.apply(partial(MixoutWrapper, p=self.args.pooler_mixout,exclude=self.args.mixout_exclude))
 
         if hasattr(self.args, 'mixout') and self.args.mixout > 0:
             self.decoder.sentence_encoder.apply(partial(MixoutWrapper, p=self.args.mixout,exclude=self.args.mixout_exclude))
@@ -145,10 +142,10 @@ class RobertaQAModel(FairseqLanguageModel):
                     
 
 
-class PoolerAnswerClass(nn.Module):
+class MNLIPoolerClass(nn.Module):
     """ Compute SQuAD 2.0 answer class from classification and start tokens hidden states. """
     def __init__(self, hidden_size, dropout=0.1):
-        super(PoolerAnswerClass, self).__init__()
+        super(MNLIPoolerClass, self).__init__()
         self.dense_0 = nn.Linear(hidden_size, hidden_size)
         self.activation = nn.Tanh() #Mish() # nn.Tanh()
         self.dropout = nn.Dropout(p=dropout)
@@ -156,14 +153,7 @@ class PoolerAnswerClass(nn.Module):
         self.hidden_size = hidden_size
 
     def forward(self, hidden_states, cls_index=None):
-
-        if cls_index is not None:
-            cls_index = cls_index[:, None, None].expand(-1, -1, self.hidden_size) # shape (bsz, 1, hsz)
-            cls_token_state = hidden_states.gather(-2, cls_index).squeeze(-2) # shape (bsz, hsz)
-        else:
-            cls_token_state = hidden_states[:, 0, :] # shape (bsz, hsz)
-
-
+        cls_token_state = hidden_states[:, 0, :] # shape (bsz, hsz)
         x = self.dense_0(cls_token_state)
         x = self.activation(x)
         x = self.dropout(x)
@@ -172,7 +162,7 @@ class PoolerAnswerClass(nn.Module):
         return x
 
 
-class RobertaQAEncoder(FairseqDecoder):
+class RobertaMNLIEncoder(FairseqDecoder):
     """RoBERTa encoder.
     Implements the :class:`~fairseq.models.FairseqDecoder` interface required
     by :class:`~fairseq.models.FairseqLanguageModel`.
@@ -201,18 +191,13 @@ class RobertaQAEncoder(FairseqDecoder):
         self.span_logits =  nn.Linear(args.encoder_embed_dim, 2)
         
         if not args.no_pooler:
-            self.answer_class = PoolerAnswerClass(args.encoder_embed_dim, args.pooler_dropout)
+            self.answer_class = MNLIPoolerClass(args.encoder_embed_dim, args.pooler_dropout)
 
-    def forward(self, src_tokens, features_only=False, return_all_hiddens=False, cls_index=None, **unused):
+    def forward(self, src_tokens, features_only=False, return_all_hiddens=False, **unused):
         x, extra = self.extract_features(src_tokens, return_all_hiddens)
         x = x.transpose(0,1)
         if not features_only:
-            start_logits, end_logits = self.span_logits(x).split(1, dim=-1)
-            if not self.args.no_pooler:
-                cls_logits = self.answer_class(x, cls_index=cls_index)
-                x = (start_logits, end_logits, cls_logits)
-            else:
-                x = (start_logits, end_logits)
+            x = self.answer_class(x)
             
         return x, extra
 
@@ -229,7 +214,7 @@ class RobertaQAEncoder(FairseqDecoder):
 
 
 
-@register_model_architecture('roberta_qa', 'roberta_qa')
+@register_model_architecture('roberta_mnli', 'roberta_mnli')
 def base_architecture(args):
     args.encoder_layers = getattr(args, 'encoder_layers', 12)
     args.encoder_embed_dim = getattr(args, 'encoder_embed_dim', 768)
@@ -245,7 +230,7 @@ def base_architecture(args):
     args.pooler_dropout = getattr(args, 'pooler_dropout', 0.0)
 
 
-@register_model_architecture('roberta_qa', 'roberta_qa_large')
+@register_model_architecture('roberta_mnli', 'roberta_mnli_large')
 def roberta_large_architecture(args):
     args.encoder_layers = getattr(args, 'encoder_layers', 24)
     args.encoder_embed_dim = getattr(args, 'encoder_embed_dim', 1024)
