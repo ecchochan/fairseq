@@ -243,6 +243,8 @@ def get_parser(desc, default_task="translation"):
                         help='weight decay excluded param names')
     parser.add_argument('--freeze-encoder', '--fe', action='store_true',
                         help='freeze the weigiht of transformer encoder')
+    parser.add_argument('--freeze-embedding', '--femb', action='store_true',
+                        help='freeze the weigiht of transformer encoder')
     parser.add_argument('--max-seq-length', type=int,
                         help='maximum number of input tokens')
 

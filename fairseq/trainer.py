@@ -31,7 +31,8 @@ def get_decayed_param_groups(named_parameters,
                              lr_decay=0.75, #0.908517, 
                              weight_decay=None, 
                              weight_decay_exclude='layer_norm,bias',
-                             freeze_encoder=False
+                             freeze_encoder=False,
+                             freeze_embedding=False,
                              ):
   lr_factors = []
   if weight_decay_exclude is not None:
@@ -67,7 +68,8 @@ def get_decayed_param_groups(named_parameters,
 
         param['lr'] = lr * factor
         #print(k+':', factor)
-        
+      if freeze_embedding and 'embed_tokens' in k or 'embed_positions' in k:
+        param['lr'] = 0
       lr_factors.append(param)
   return lr_factors
       
@@ -193,6 +195,7 @@ class Trainer(object):
                 weight_decay=self.args.weight_decay,
                 weight_decay_exclude=self.args.weight_decay_exclude,
                 freeze_encoder=self.args.freeze_encoder,
+                freeze_embedding=self.args.freeze_embedding,
                 lr=float(self.args.lr[0]), 
                 lr_decay=float(self.args.lr_decay),)
         else:
