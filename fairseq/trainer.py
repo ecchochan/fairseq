@@ -281,8 +281,9 @@ class Trainer(object):
                     self.get_criterion().load_state_dict(
                         state["criterion"], strict=True
                     )
-            except Exception:
+            except Exception as e:
                 print(
+                    e,
                     "Cannot load model parameters from checkpoint {}; "
                     "please ensure that the architectures match.".format(filename)
                 )
